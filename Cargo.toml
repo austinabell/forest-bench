@@ -1,0 +1,22 @@
+[package]
+name = "forest_bench"
+version = "0.1.0"
+authors = ["austinabell <austinabell8@gmail.com>"]
+edition = "2018"
+
+[features]
+default = ["rocksdb"]
+rocksdb = ["db/rocksdb", "ipld_blockstore/rocksdb"]
+
+[dependencies]
+structopt = "0.3"
+pretty_env_logger = "0.4.0"
+log = "0.4.8"
+async-log = "2.0.0"
+genesis = { path = "../../ChainSafe/forest/utils/genesis" }
+db = { path = "../../ChainSafe/forest/node/db" }
+chain = { path = "../../ChainSafe/forest/blockchain/chain" }
+async-std = { version = "1.6.3", features = ["attributes"] }
+state_manager = { path = "../../ChainSafe/forest/blockchain/state_manager" }
+ipld_blockstore = { path = "../../ChainSafe/forest/ipld/blockstore" }
+fil_types = { path = "../../ChainSafe/forest/types" }
