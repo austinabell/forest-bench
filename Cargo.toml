@@ -5,8 +5,7 @@ authors = ["austinabell <austinabell8@gmail.com>"]
 edition = "2018"
 
 [features]
-default = ["rocksdb"]
-rocksdb = ["db/rocksdb", "ipld_blockstore/rocksdb"]
+default = []
 
 [dependencies]
 structopt = "0.3"
@@ -14,9 +13,11 @@ pretty_env_logger = "0.4.0"
 log = "0.4.8"
 async-log = "2.0.0"
 genesis = { path = "../../ChainSafe/forest/utils/genesis" }
-db = { path = "../../ChainSafe/forest/node/db" }
+forest_car = { path = "../../ChainSafe/forest/ipld/car" }
+db = { path = "../../ChainSafe/forest/node/db", features = ["rocksdb"] }
 chain = { path = "../../ChainSafe/forest/blockchain/chain" }
+forest_blocks = { path = "../../ChainSafe/forest/blockchain/blocks" }
 async-std = { version = "1.6.3", features = ["attributes"] }
 state_manager = { path = "../../ChainSafe/forest/blockchain/state_manager" }
-ipld_blockstore = { path = "../../ChainSafe/forest/ipld/blockstore" }
+ipld_blockstore = { path = "../../ChainSafe/forest/ipld/blockstore", features = ["rocksdb"] }
 fil_types = { path = "../../ChainSafe/forest/types" }
