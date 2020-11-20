@@ -7,7 +7,6 @@ use forest_car::CarReader;
 use genesis::{import_chain, initialize_genesis};
 use state_manager::StateManager;
 use std::fs::File;
-use std::io::BufReader;
 use std::sync::Arc;
 use structopt::StructOpt;
 
@@ -84,9 +83,7 @@ async fn main() {
                     .await
                     .unwrap();
             } else {
-                let file = File::open(car).expect("Snapshot file path not found!");
-                let reader = BufReader::new(file);
-                import_chain::<FullVerifier, _, _>(&state_manager, reader, Some(height))
+                import_chain::<FullVerifier, _>(&state_manager, &car, Some(height))
                     .await
                     .unwrap();
             }
