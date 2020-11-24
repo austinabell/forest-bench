@@ -62,6 +62,9 @@ pub enum Cli {
             help = "Number of state roots to include"
         )]
         recent_roots: i64,
+
+        #[structopt(short, long, help = "Skip exporting old messages")]
+        skip_old_msgs: bool,
     },
 }
 
@@ -121,6 +124,7 @@ async fn main() {
             data_dir,
             height,
             recent_roots,
+            skip_old_msgs,
         } => {
             let db = {
                 let dir = data_dir
@@ -155,7 +159,7 @@ async fn main() {
             let writer = AsyncBufWriter::new(file);
 
             chain_store
-                .export(&ts, recent_roots, false, writer)
+                .export(&ts, recent_roots, skip_old_msgs, writer)
                 .await
                 .unwrap();
         }
