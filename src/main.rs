@@ -1,5 +1,7 @@
 mod logger;
 
+use async_std::fs::File as AsyncFile;
+use async_std::io::BufWriter as AsyncBufWriter;
 use chain::ChainStore;
 use fil_types::verifier::FullVerifier;
 use forest_blocks::TipsetKeys;
@@ -7,6 +9,7 @@ use forest_car::CarReader;
 use genesis::{import_chain, initialize_genesis};
 use state_manager::StateManager;
 use std::fs::File;
+use std::io::BufReader;
 use std::sync::Arc;
 use structopt::StructOpt;
 
@@ -38,6 +41,28 @@ pub enum Cli {
         #[structopt(short, long, help = "Skip loading full car file")]
         skip_load: bool,
     },
+    #[structopt(name = "export", about = "export chain data to car file")]
+    Export {
+        #[structopt(help = "Import car file to use for exporting at height")]
+        car: String,
+
+        #[structopt(help = "Height to export chain from")]
+        height: i64,
+
+        #[structopt(short, long, help = "File to export to")]
+        out: String,
+
+        #[structopt(short, long, help = "Data directory for chain data")]
+        data_dir: Option<String>,
+
+        #[structopt(
+            short,
+            long,
+            default_value = "900",
+            help = "Number of state roots to include"
+        )]
+        recent_roots: i64,
+    },
 }
 
 #[async_std::main]
@@ -58,8 +83,7 @@ async fn main() {
                     // TODO switch to home dir
                     .unwrap_or("data");
 
-                let mut db = db::RocksDb::new(format!("{}{}", dir, "/db"));
-                db.open().unwrap();
+                let db = db::rocks::RocksDb::open(format!("{}{}", dir, "/db")).unwrap();
                 Arc::new(db)
             };
 
@@ -73,7 +97,8 @@ async fn main() {
             // Sync from snapshot
             if skip_load {
                 let file = File::open(car).expect("Snapshot file path not found!");
-                let cr = CarReader::new(file).unwrap();
+                let file_reader = BufReader::new(file);
+                let cr = CarReader::new(file_reader).unwrap();
                 let ts = chain_store
                     .tipset_from_keys(&TipsetKeys::new(cr.header.roots))
                     .await
@@ -87,6 +112,48 @@ async fn main() {
                     .await
                     .unwrap();
             }
+        }
+        Cli::Export {
+            car,
+            out,
+            data_dir,
+            height,
+            recent_roots,
+        } => {
+            let db = {
+                let dir = data_dir
+                    .as_ref()
+                    .map(|s| s.as_str())
+                    // TODO switch to home dir
+                    .unwrap_or("data");
+
+                let db = db::rocks::RocksDb::open(format!("{}{}", dir, "/db")).unwrap();
+                Arc::new(db)
+            };
+
+            let chain_store = Arc::new(ChainStore::new(Arc::clone(&db)));
+
+            let file = File::open(car).expect("Snapshot file path not found!");
+            let file_reader = BufReader::new(file);
+            let cr = CarReader::new(file_reader).unwrap();
+            let mut ts = chain_store
+                .tipset_from_keys(&TipsetKeys::new(cr.header.roots))
+                .await
+                .unwrap();
+
+            while ts.epoch() > height {
+                ts = chain_store.tipset_from_keys(ts.parents()).await.unwrap();
+            }
+
+            let file = AsyncFile::create(out)
+                .await
+                .expect("Snapshot file path not found!");
+            let writer = AsyncBufWriter::new(file);
+
+            chain_store
+                .export(&ts, recent_roots, false, writer)
+                .await
+                .unwrap();
         }
     }
 }
