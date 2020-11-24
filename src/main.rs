@@ -1,6 +1,8 @@
 mod logger;
 
 use async_std::fs::File as AsyncFile;
+use async_std::fs::File;
+use async_std::io::BufReader;
 use async_std::io::BufWriter as AsyncBufWriter;
 use chain::ChainStore;
 use fil_types::verifier::FullVerifier;
@@ -8,8 +10,6 @@ use forest_blocks::TipsetKeys;
 use forest_car::CarReader;
 use genesis::{import_chain, initialize_genesis};
 use state_manager::StateManager;
-use std::fs::File;
-use std::io::BufReader;
 use std::sync::Arc;
 use structopt::StructOpt;
 
@@ -92,13 +92,15 @@ async fn main() {
             let state_manager = Arc::new(StateManager::new(Arc::clone(&chain_store)));
 
             // Read default Genesis into state (needed for validation)
-            initialize_genesis(None, &state_manager).unwrap();
+            initialize_genesis(None, &state_manager).await.unwrap();
 
             // Sync from snapshot
             if skip_load {
-                let file = File::open(car).expect("Snapshot file path not found!");
+                let file = File::open(car)
+                    .await
+                    .expect("Snapshot file path not found!");
                 let file_reader = BufReader::new(file);
-                let cr = CarReader::new(file_reader).unwrap();
+                let cr = CarReader::new(file_reader).await.unwrap();
                 let ts = chain_store
                     .tipset_from_keys(&TipsetKeys::new(cr.header.roots))
                     .await
@@ -133,9 +135,11 @@ async fn main() {
 
             let chain_store = Arc::new(ChainStore::new(Arc::clone(&db)));
 
-            let file = File::open(car).expect("Snapshot file path not found!");
+            let file = File::open(car)
+                .await
+                .expect("Snapshot file path not found!");
             let file_reader = BufReader::new(file);
-            let cr = CarReader::new(file_reader).unwrap();
+            let cr = CarReader::new(file_reader).await.unwrap();
             let mut ts = chain_store
                 .tipset_from_keys(&TipsetKeys::new(cr.header.roots))
                 .await

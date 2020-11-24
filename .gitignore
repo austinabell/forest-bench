@@ -1,5 +1,5 @@
 /target
 .cargo
 chain*
-/data
+/data*
 Cargo.lock
