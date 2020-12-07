@@ -86,7 +86,7 @@ async fn main() {
                     // TODO switch to home dir
                     .unwrap_or("data");
 
-                let db = db::rocks::RocksDb::open(format!("{}{}", dir, "/db")).unwrap();
+                let db = forest_db::rocks::RocksDb::open(format!("{}{}", dir, "/db")).unwrap();
                 Arc::new(db)
             };
 
@@ -133,7 +133,7 @@ async fn main() {
                     // TODO switch to home dir
                     .unwrap_or("data");
 
-                let db = db::rocks::RocksDb::open(format!("{}{}", dir, "/db")).unwrap();
+                let db = forest_db::rocks::RocksDb::open(format!("{}{}", dir, "/db")).unwrap();
                 Arc::new(db)
             };
 

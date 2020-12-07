@@ -14,7 +14,7 @@ log = "0.4.8"
 async-log = "2.0.0"
 genesis = { path = "../../ChainSafe/forest/utils/genesis" }
 forest_car = { path = "../../ChainSafe/forest/ipld/car" }
-db = { path = "../../ChainSafe/forest/node/db", features = ["rocksdb"] }
+forest_db = { path = "../../ChainSafe/forest/node/db", features = ["rocksdb"] }
 chain = { path = "../../ChainSafe/forest/blockchain/chain" }
 forest_blocks = { path = "../../ChainSafe/forest/blockchain/blocks" }
 async-std = { version = "1.6.3", features = ["attributes"] }
