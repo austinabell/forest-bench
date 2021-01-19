@@ -98,25 +98,9 @@ async fn main() {
             initialize_genesis(None, &state_manager).await.unwrap();
 
             // Sync from snapshot
-            if skip_load {
-                let file = File::open(car)
-                    .await
-                    .expect("Snapshot file path not found!");
-                let file_reader = BufReader::new(file);
-                let cr = CarReader::new(file_reader).await.unwrap();
-                let ts = chain_store
-                    .tipset_from_keys(&TipsetKeys::new(cr.header.roots))
-                    .await
-                    .unwrap();
-                state_manager
-                    .validate_chain::<FullVerifier>(ts, height)
-                    .await
-                    .unwrap();
-            } else {
-                import_chain::<FullVerifier, _>(&state_manager, &car, Some(height))
-                    .await
-                    .unwrap();
-            }
+            import_chain::<FullVerifier, _>(&state_manager, &car, Some(height), skip_load)
+                .await
+                .unwrap();
         }
         Cli::Export {
             car,

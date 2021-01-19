@@ -14,10 +14,29 @@ log = "0.4.8"
 async-log = "2.0.0"
 genesis = { path = "../../ChainSafe/forest/utils/genesis" }
 forest_car = { path = "../../ChainSafe/forest/ipld/car" }
-forest_db = { path = "../../ChainSafe/forest/node/db", features = ["rocksdb"] }
+forest_db = { version = "0.1", features = ["rocksdb"] }
 chain = { path = "../../ChainSafe/forest/blockchain/chain" }
 forest_blocks = { path = "../../ChainSafe/forest/blockchain/blocks" }
 async-std = { version = "1.6.3", features = ["attributes"] }
 state_manager = { path = "../../ChainSafe/forest/blockchain/state_manager" }
-ipld_blockstore = { path = "../../ChainSafe/forest/ipld/blockstore", features = ["rocksdb"] }
+ipld_blockstore = { version = "0.1", features = ["rocksdb"] }
 fil_types = { path = "../../ChainSafe/forest/types" }
+
+[patch.crates-io]
+ipld_blockstore = { path = "../../ChainSafe/forest/ipld/blockstore" }
+fil_types = { path = "../../ChainSafe/forest/types" }
+fil_clock = { path = "../../ChainSafe/forest/node/clock" }
+forest_db = { path = "../../ChainSafe/forest/node/db" }
+forest_crypto = { path = "../../ChainSafe/forest/crypto" }
+forest_address = { path = "../../ChainSafe/forest/vm/address" }
+forest_bigint = { path = "../../ChainSafe/forest/utils/bigint" }
+forest_bitfield = { path = "../../ChainSafe/forest/utils/bitfield" }
+forest_cid = { path = "../../ChainSafe/forest/ipld/cid" }
+forest_ipld = { path = "../../ChainSafe/forest/ipld" }
+forest_encoding = { path = "../../ChainSafe/forest/encoding" }
+forest_hash_utils = { path = "../../ChainSafe/forest/utils/hash_utils" }
+forest_json_utils = { path = "../../ChainSafe/forest/utils/json_utils" }
+commcid = { path = "../../ChainSafe/forest/utils/commcid" }
+forest_vm = { path = "../../ChainSafe/forest/vm" }
+forest_runtime = { path = "../../ChainSafe/forest/vm/runtime" }
+forest_message = { path = "../../ChainSafe/forest/vm/message" }
