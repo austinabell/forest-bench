@@ -95,7 +95,9 @@ async fn main() {
             let state_manager = Arc::new(StateManager::new(Arc::clone(&chain_store)));
 
             // Read default Genesis into state (needed for validation)
-            initialize_genesis(None, &state_manager).await.unwrap();
+            if !skip_load {
+                initialize_genesis(None, &state_manager).await.unwrap();
+            }
 
             // Sync from snapshot
             import_chain::<FullVerifier, _>(&state_manager, &car, Some(height), skip_load)
